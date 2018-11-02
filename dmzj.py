@@ -39,14 +39,14 @@ def add_to_markdowm(cont):
 for JuanJson in JuanJsons: 
     volume_id = JuanJson['volume_id']#卷ID
     volume_name = JuanJson['volume_name']#卷名
-    add_to_markdowm('# '+volume_name)
+    add_to_markdowm('## '+volume_name)
     add_to_catalog(volume_name)
     chapters_lists = JuanJson['chapters']
     for chapter_list in chapters_lists:
         No+=1
         chapter_id = chapter_list['chapter_id']#章节ID
         chapter_name = chapter_list['chapter_name']#章节名
-        add_to_markdowm('## '+chapter_name)
+        add_to_markdowm('### '+chapter_name)
         add_to_catalog(chapter_name)
         Chapter_name = str(No).zfill(2) + volume_name + chapter_list['chapter_name']
         DownloadUrl = 'http://v2.api.dmzj.com/novel/download/%d_%d_%d.txt'%(BookId,volume_id,chapter_id)
