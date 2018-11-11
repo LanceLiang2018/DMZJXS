@@ -12,7 +12,7 @@ from urllib import request
 BasePath = 'C:/Users/fuwen/Desktop/'
 os.chdir(BasePath)
 No = 0
-BookId = 2304  
+BookId = 2304   
 NovelUrl = 'http://v2.api.dmzj.com/novel/%d.json'%(BookId)
 NovelData = requests.get(NovelUrl).text
 NovelData = NovelData.replace('<br>','')
@@ -45,7 +45,14 @@ def add_to_markdowm(cont):
     with open(BookName + '.md','a',encoding = 'utf-8') as g:
         g.writelines([cont,'\n\n'])
         
-        
+def html_to_MD(text):
+    ImgCode = re.findall('<img.*/>',text)[0]
+    text = text.replace(ImgCode,'')
+    ImgUrls = re.findall('src="(.*?jpg)',ImgCode)
+    for ImgUrl in ImgUrls:
+        MD = '![](%s)\n\n' % ImgUrl
+        text = text + MD
+    return text
 
 for JuanJson in JuanJsons: 
     volume_id = JuanJson['volume_id']#卷ID
@@ -76,6 +83,11 @@ for JuanJson in JuanJsons:
         #删除markdown中的卷名、章节名
         Text = text.replace(volume_name,'')
         Text = Text.replace(chapter_name,'')
+        try:
+            Text = html_to_MD(Text)
+        except Exception as e:
+            pass
+        
         add_to_markdowm(Text)
         print('已下载 --- '+Chapter_name)
         with open(Chapter_name + '.txt','a',encoding = 'utf-8') as f:
