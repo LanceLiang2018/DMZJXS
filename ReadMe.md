@@ -6,7 +6,9 @@
 
 利用markdown转，如：
 
-利用Typora转换为Epub（文件---导出---Epub）等格式。
+1.利用Typora转换为Epub（文件---导出---Epub）等格式。
+
+2.利用Calibre转换为Epub（添加书籍---转换书籍---内容目录---`一级目录（//h:h2）` `二级目录(//h:h3`）
 
 ![mark](http://imgs.bizha.top/blog/181102/khAjgFdifk.jpg?imageslim)
 
