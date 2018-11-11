@@ -12,7 +12,7 @@ from urllib import request
 BasePath = 'C:/Users/fuwen/Desktop/'
 os.chdir(BasePath)
 No = 0
-BookId = 72  
+BookId = 2304  
 NovelUrl = 'http://v2.api.dmzj.com/novel/%d.json'%(BookId)
 NovelData = requests.get(NovelUrl).text
 NovelData = NovelData.replace('<br>','')
@@ -38,12 +38,13 @@ JuanJsons = json.loads(JuanData)
 
 # 添加至目录
 def add_to_catalog(catalog):
-    with open('catalog.txt','a') as f:
+    with open('catalog.txt','a',encoding = 'utf-8') as f:
         f.writelines([catalog,'\n\n'])
 
 def add_to_markdowm(cont):
-    with open(BookName + '.md','a') as g:
+    with open(BookName + '.md','a',encoding = 'utf-8') as g:
         g.writelines([cont,'\n\n'])
+        
         
 
 for JuanJson in JuanJsons: 
@@ -76,7 +77,8 @@ for JuanJson in JuanJsons:
         Text = text.replace(volume_name,'')
         Text = Text.replace(chapter_name,'')
         add_to_markdowm(Text)
-        with open(Chapter_name + '.txt','a') as f:
+        print('已下载 --- '+Chapter_name)
+        with open(Chapter_name + '.txt','a',encoding = 'utf-8') as f:
             f.writelines([text,'\n\n'])
 
 
