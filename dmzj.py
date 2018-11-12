@@ -12,7 +12,8 @@ from urllib import request
 BasePath = 'C:/Users/fuwen/Desktop/'
 os.chdir(BasePath)
 No = 0
-BookId = 2304   
+BookId = 2304 
+global Count
 NovelUrl = 'http://v2.api.dmzj.com/novel/%d.json'%(BookId)
 NovelData = requests.get(NovelUrl).text
 NovelData = NovelData.replace('<br>','')
@@ -27,8 +28,16 @@ if not isExists:
     os.makedirs(Path)
 os.chdir(BasePath + Path)
 
-request.urlretrieve(CoverUrl,'封面.jpg') 
-print('已下载封面！')
+ImgPath = 'imgs'
+isExists=os.path.exists(ImgPath)
+if not isExists:
+    os.makedirs(ImgPath)
+
+
+TxtPath = 'TXT'
+isExists=os.path.exists(TxtPath)
+if not isExists:
+    os.makedirs(TxtPath)
 
 JuanUrl = 'http://v2.api.dmzj.com/novel/chapter/%d.json'%(BookId)
 JuanData = requests.get(JuanUrl).content
@@ -38,7 +47,7 @@ JuanJsons = json.loads(JuanData)
 
 # 添加至目录
 def add_to_catalog(catalog):
-    with open('catalog.txt','a',encoding = 'utf-8') as f:
+    with open(TxtPath + '\\catalog.txt','a',encoding = 'utf-8') as f:
         f.writelines([catalog,'\n\n'])
 
 def add_to_markdowm(cont):
@@ -46,13 +55,25 @@ def add_to_markdowm(cont):
         g.writelines([cont,'\n\n'])
         
 def html_to_MD(text):
+    Count = 0
     ImgCode = re.findall('<img.*/>',text)[0]
     text = text.replace(ImgCode,'')
     ImgUrls = re.findall('src="(.*?jpg)',ImgCode)
     for ImgUrl in ImgUrls:
-        MD = '![](%s)\n\n' % ImgUrl
+        ImgName =  str(No) + '_' + str(Count) +'.jpg'
+        download_pic(ImgUrl,ImgName)
+        MD = '![](%s)\n\n' % (ImgPath + '/'+ImgName)
         text = text + MD
+        Count+=1
     return text
+
+def download_pic(ImageUrl,ImgName):
+    request.urlretrieve(ImageUrl,ImgPath + '\\'+ ImgName )
+    print('图片%s下载已完成……'%ImgName)
+
+
+download_pic(CoverUrl,'封面.jpg')
+
 
 for JuanJson in JuanJsons: 
     volume_id = JuanJson['volume_id']#卷ID
@@ -89,8 +110,10 @@ for JuanJson in JuanJsons:
             pass
         
         add_to_markdowm(Text)
-        print('已下载 --- '+Chapter_name)
-        with open(Chapter_name + '.txt','a',encoding = 'utf-8') as f:
+        print('已下载 --- ' + Chapter_name)
+        with open(TxtPath + '\\'+ Chapter_name + '.txt','a',encoding = 'utf-8') as f:
             f.writelines([text,'\n\n'])
 
 
+#pandoc下载
+os.system('pandoc %s.md -o %s.epub'%(BookName,BookName))
