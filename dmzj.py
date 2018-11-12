@@ -9,10 +9,13 @@ Created on Fri Nov  2 00:08:34 2018
 import requests,json,re,os
 from urllib import request
 
+#配置
+BookId = 1 
 BasePath = 'C:/Users/fuwen/Desktop/'
+
+
 os.chdir(BasePath)
 No = 0
-BookId = 2304 
 global Count
 NovelUrl = 'http://v2.api.dmzj.com/novel/%d.json'%(BookId)
 NovelData = requests.get(NovelUrl).text
@@ -49,11 +52,11 @@ JuanJsons = json.loads(JuanData)
 def add_to_catalog(catalog):
     with open(TxtPath + '\\catalog.txt','a',encoding = 'utf-8') as f:
         f.writelines([catalog,'\n\n'])
-
+# 目录添加至markdown文件
 def add_to_markdowm(cont):
     with open(BookName + '.md','a',encoding = 'utf-8') as g:
         g.writelines([cont,'\n\n'])
-        
+# 内容添加至markdown文件        
 def html_to_MD(text):
     Count = 0
     ImgCode = re.findall('<img.*/>',text)[0]
@@ -66,14 +69,27 @@ def html_to_MD(text):
         text = text + MD
         Count+=1
     return text
-
+# 下载图片
 def download_pic(ImageUrl,ImgName):
     request.urlretrieve(ImageUrl,ImgPath + '\\'+ ImgName )
     print('图片%s下载已完成……'%ImgName)
 
+# 文件名去特殊字符\/：*“<>|?
+def ChangeFileName(filename):
+    filename = filename.replace('\\','')
+    filename = filename.replace('/','')
+    filename = filename.replace('：','')
+    filename = filename.replace('*','')
+    filename = filename.replace('“','')
+    filename = filename.replace('<','')
+    filename = filename.replace('>','')
+    filename = filename.replace('|','')
+    filename = filename.replace('?','？')
+    return filename
 
-download_pic(CoverUrl,'封面.jpg')
-
+#下载封面
+request.urlretrieve(CoverUrl,'cover.jpg')
+print('封面已下载')
 
 for JuanJson in JuanJsons: 
     volume_id = JuanJson['volume_id']#卷ID
@@ -111,9 +127,10 @@ for JuanJson in JuanJsons:
         
         add_to_markdowm(Text)
         print('已下载 --- ' + Chapter_name)
+        Chapter_name = ChangeFileName(Chapter_name)
         with open(TxtPath + '\\'+ Chapter_name + '.txt','a',encoding = 'utf-8') as f:
             f.writelines([text,'\n\n'])
 
 
 #pandoc下载
-os.system('pandoc %s.md -o %s.epub'%(BookName,BookName))
+os.system('pandoc %s.md -o %s.epub --epub-cover-image=cover.jpg'%(BookName,BookName))
